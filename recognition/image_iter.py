@@ -173,7 +173,7 @@ class FaceImageIter(io.DataIter):
     def compress_aug(self, img):
       buf = BytesIO()
       img = Image.fromarray(img.asnumpy(), 'RGB')
-      q = random.randint(2, 20)
+      q = random.randint(10, 40)
       img.save(buf, format='JPEG', quality=q)
       buf = buf.getvalue()
       img = Image.open(BytesIO(buf))
