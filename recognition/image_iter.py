@@ -12,7 +12,7 @@ import sklearn
 import datetime
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, ImageFilter
 from io import BytesIO
 
 import mxnet as mx
@@ -179,6 +179,33 @@ class FaceImageIter(io.DataIter):
       img = Image.open(BytesIO(buf))
       return nd.array(np.asarray(img, 'float32'))
 
+    def blur_aug(self, img):
+      _rd = random.randint(0,2)
+      if _rd == 0:
+        img = Image.fromarray(img.asnumpy(), 'RGB')
+        r = random.uniform(1, 2)
+        img = img.filter(ImageFilter.GaussianBlur(radius=r))
+        img = nd.array(np.asarray(img, 'float32'))
+      elif _rd == 1:
+        img = Image.fromarray(img.asnumpy(), 'RGB')
+        img = img.filter(ImageFilter.MedianFilter(3))
+        img = nd.array(np.asarray(img, 'float32'))
+      elif _rd == 2:
+        img = Image.fromarray(img.asnumpy(), 'RGB')
+        r = random.uniform(1, 2)
+        img = img.filter(ImageFilter.BoxBlur(r))
+        img = nd.array(np.asarray(img, 'float32'))
+      return img
+
+    def downsample_aug(self, img):
+      img = Image.fromarray(img.asnumpy(), 'RGB')
+      s = random.choice([2, 3, 4])
+      w, h = img.size
+      img = img.resize((w//s, h//s))
+      img = img.resize((w, h), random.choice([Image.BILINEAR, Image.NEAREST]))
+      img = nd.array(np.asarray(img, 'float32'))
+      return img
+
 
     def next(self):
         if not self.is_init:
@@ -205,8 +232,14 @@ class FaceImageIter(io.DataIter):
                     _data = mx.ndarray.flip(data=_data, axis=1)
                 if self.color_jittering>0:
                   if self.color_jittering>1:
-                    _rd = random.randint(0,1)
-                    if _rd==1:
+                    _rd = random.random()
+                    if _rd < 0.3:
+                      _data = self.downsample_aug(_data)
+                    _rd = random.random()
+                    if _rd < 0.3:
+                      _data = self.blur_aug(_data)
+                    _rd = random.random()
+                    if _rd < 0.4:
                       _data = self.compress_aug(_data)
                   #print('do color aug')
                   _data = _data.astype('float32', copy=False)

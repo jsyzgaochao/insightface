@@ -35,6 +35,7 @@ network = edict()
 network.r100 = edict()
 network.r100.net_name = 'fresnet'
 network.r100.num_layers = 100
+network.r100.per_batch_size = 64
 
 network.r100fc = edict()
 network.r100fc.net_name = 'fresnet'
@@ -119,6 +120,13 @@ dataset.retina.dataset_path = '../datasets/ms1m-retinaface-t1'
 dataset.retina.num_classes = 93431
 dataset.retina.image_shape = (112,112,3)
 dataset.retina.val_targets = ['lfw', 'cfp_fp', 'agedb_30']
+
+dataset.glint = edict()
+dataset.glint.dataset = 'glint'
+dataset.glint.dataset_path = '../datasets/faces_glint'
+dataset.glint.num_classes = 180855
+dataset.glint.image_shape = (112,112,3)
+dataset.glint.val_targets = ['lfw', 'cfp_fp', 'agedb_30']
 
 loss = edict()
 loss.softmax = edict()
