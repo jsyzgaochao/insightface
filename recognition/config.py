@@ -35,7 +35,13 @@ network = edict()
 network.r100 = edict()
 network.r100.net_name = 'fresnet'
 network.r100.num_layers = 100
-network.r100.per_batch_size = 96
+network.r100.per_batch_size = 80
+
+network.r100se = edict()
+network.r100se.net_name = 'fresnet'
+network.r100se.num_layers = 100
+network.r100se.per_batch_size = 80
+network.r100se.net_se = 1
 
 network.r100fc = edict()
 network.r100fc.net_name = 'fresnet'
@@ -198,7 +204,7 @@ default.wd = 0.0005
 default.mom = 0.9
 default.per_batch_size = 128
 default.ckpt = 3
-default.lr_steps = '90000,150000,200000'
+default.lr_steps = '120000,180000,240000'
 default.models_root = './models'
 
 

@@ -233,7 +233,7 @@ class FaceImageIter(io.DataIter):
                 if self.color_jittering>0:
                   if self.color_jittering>1:
                     _rd = random.random()
-                    if _rd < 0.3:
+                    if _rd < 0.2:
                       _data = self.downsample_aug(_data)
                     _rd = random.random()
                     if _rd < 0.3:
@@ -244,7 +244,9 @@ class FaceImageIter(io.DataIter):
                   #print('do color aug')
                   _data = _data.astype('float32', copy=False)
                   #print(_data.__class__)
-                  _data = self.color_aug(_data, 0.125)
+                  _rd = random.randint(0,1)
+                  if _rd==1:
+                    _data = self.color_aug(_data, 0.125)
                 if self.nd_mean is not None:
                   _data = _data.astype('float32', copy=False)
                   _data -= self.nd_mean
