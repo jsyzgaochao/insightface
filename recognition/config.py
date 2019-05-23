@@ -35,9 +35,6 @@ network = edict()
 network.r100 = edict()
 network.r100.net_name = 'fresnet'
 network.r100.num_layers = 100
-<<<<<<< HEAD
-network.r100.per_batch_size = 72
-=======
 network.r100.per_batch_size = 80
 
 network.r100se = edict()
@@ -45,7 +42,6 @@ network.r100se.net_name = 'fresnet'
 network.r100se.num_layers = 100
 network.r100se.per_batch_size = 80
 network.r100se.net_se = 1
->>>>>>> f3d95b492fa1a792c9f5f970a5a5922a0c21eb44
 
 network.r100fc = edict()
 network.r100fc.net_name = 'fresnet'
