@@ -23,7 +23,7 @@ config.fc7_no_bias = False
 config.max_steps = 0
 config.data_rand_mirror = True
 config.data_cutoff = False
-config.data_color = 2
+config.data_color = 0
 config.data_images_filter = 0
 config.count_flops = True
 config.memonger = False #not work now
@@ -194,13 +194,13 @@ loss.atriplet.lr = 0.05
 default = edict()
 
 # default network
-default.network = 'r100'
+default.network = 'g1'
 default.pretrained = ''
 default.pretrained_epoch = 1
 # default dataset
-default.dataset = 'emore'
+default.dataset = 'retina'
 default.loss = 'arcface'
-default.frequent = 20
+default.frequent = 50
 default.verbose = 2000
 default.kvstore = 'device'
 
@@ -210,7 +210,7 @@ default.wd = 0.0005
 default.mom = 0.9
 default.per_batch_size = 128
 default.ckpt = 3
-default.lr_steps = '120000,180000,240000'
+default.lr_steps = '80000,120000,160000'
 default.models_root = './models'
 
 
