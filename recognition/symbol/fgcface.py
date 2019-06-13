@@ -65,30 +65,31 @@ def get_symbol():
     data = data-127.5
     data = data*0.0078125
     blocks = config.net_blocks
-    conv_1 = Conv(data, num_filter=64, kernel=(5, 5), pad=(2, 2), stride=(2, 2), name="conv_1")
+    conv_1 = Conv(data, num_filter=48, kernel=(5, 5), pad=(2, 2), stride=(2, 2), name="conv_1")
     if blocks[0]==1:
-      conv_2_dw = Conv(conv_1, num_group=64, num_filter=64, kernel=(3, 3), pad=(1, 1), stride=(1, 1), name="conv_2_dw")
+      conv_2_dw = Conv(conv_1, num_group=48, num_filter=48, kernel=(3, 3), pad=(1, 1), stride=(1, 1), name="conv_2_dw")
     else:
-      conv_2_dw = Residual(conv_1, num_block=blocks[0], num_out=64, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=64, name="res_2")
+      conv_2_dw = Residual(conv_1, num_block=blocks[0], num_out=48, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=48, name="res_2")
 
     conv_23 = DResidual(conv_2_dw, num_out=64, kernel=(5, 5), stride=(2, 2), pad=(2, 2), num_group=128, name="dconv_23")
-    conv_3a = Residual(conv_23, num_block=blocks[1], num_out=64, kernel=(5, 5), stride=(1, 1), pad=(2, 2), num_group=128, name="res_3a")
+    conv_3a = Residual(conv_23, num_block=blocks[1]//2, num_out=64, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=128, name="res_3a")
     conv_3ase = SEModule(conv_3a, 64, "res_3ase")
-    conv_3b = Residual(conv_3ase, num_block=blocks[2], num_out=64, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=128, name="res_3b")
+    conv_3b = Residual(conv_3ase, num_block=blocks[1]-blocks[1]//2, num_out=64, kernel=(5, 5), stride=(1, 1), pad=(2, 2), num_group=128, name="res_3b")
     conv_3bse = SEModule(conv_3b, 64, "res_3bse")
 
     conv_34 = DResidual(conv_3bse, num_out=128, kernel=(5, 5), stride=(2, 2), pad=(2, 2), num_group=256, name="dconv_34")
-    conv_4a = Residual(conv_34, num_block=blocks[3], num_out=128, kernel=(5, 5), stride=(1, 1), pad=(2, 2), num_group=256, name="res_4a")
+    conv_4a = Residual(conv_34, num_block=blocks[2]//2, num_out=128, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=256, name="res_4a")
     conv_4ase = SEModule(conv_4a, 128, "res_4ase")
-    conv_4b = Residual(conv_4ase, num_block=blocks[4], num_out=128, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=256, name="res_4b")
+    conv_4b = Residual(conv_4ase, num_block=blocks[2]-blocks[2]//2, num_out=128, kernel=(5, 5), stride=(1, 1), pad=(2, 2), num_group=256, name="res_4b")
     conv_4bse = SEModule(conv_4b, 128, "res_4bse")
 
-    conv_45 = DResidual(conv_4bse, num_out=128, kernel=(5, 5), stride=(2, 2), pad=(2, 2), num_group=512, name="dconv_45")
-    conv_5 = Residual(conv_45, num_block=blocks[5], num_out=128, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=384, name="res_5")
-    conv_5se = SEModule(conv_5, 128, "res_5se")
+    conv_45 = DResidual(conv_4bse, num_out=160, kernel=(5, 5), stride=(2, 2), pad=(2, 2), num_group=512, name="dconv_45")
+    conv_5a = Residual(conv_45, num_block=blocks[3]//2, num_out=160, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=480, name="res_5a")
+    conv_5ase = SEModule(conv_5a, 160, "res_5ase")
+    conv_5b = Residual(conv_5ase, num_block=blocks[3]-blocks[3]//2, num_out=160, kernel=(5, 5), stride=(1, 1), pad=(2, 2), num_group=480, name="res_5b")
+    conv_5bse = SEModule(conv_5b, 160, "res_5bse")
 
-    conv_6_sep = Conv(conv_5se, num_filter=512, kernel=(1, 1), pad=(0, 0), stride=(1, 1), name="conv_6sep")
+    conv_6_sep = Conv(conv_5bse, num_filter=640, kernel=(1, 1), pad=(0, 0), stride=(1, 1), name="conv_6sep")
 
-    fc1 = symbol_utils.get_fc1(conv_6_sep, num_classes, fc_type)
+    fc1 = symbol_utils.get_fc1(conv_6_sep, num_classes, fc_type, input_channel=640)
     return fc1
-

@@ -84,7 +84,7 @@ network.g1 = edict()
 network.g1.net_name = 'fgcface'
 network.g1.emb_size = 256
 network.g1.net_output = 'GDC'
-network.g1.net_blocks = [2,3,5,5,11,4]
+network.g1.net_blocks = [2,8,16,6]
 
 network.m1 = edict()
 network.m1.net_name = 'fmobilenet'
