@@ -30,15 +30,14 @@ def Linear(data, num_filter=1, kernel=(1, 1), stride=(1, 1), pad=(0, 0), num_gro
 
 def ConvOnly(data, num_filter=1, kernel=(1, 1), stride=(1, 1), pad=(0, 0), num_group=1, name=None, suffix=''):
     conv = sym.Convolution(data=data, num_filter=num_filter, kernel=kernel, num_group=num_group, stride=stride, pad=pad, no_bias=True, name='%s%s_conv2d' %(name, suffix))
-    return conv    
+    return conv
 
-    
 def DResidual(data, num_out=1, kernel=(3, 3), stride=(2, 2), pad=(1, 1), num_group=1, name=None, suffix=''):
     conv = Conv(data=data, num_filter=num_group, kernel=(1, 1), pad=(0, 0), stride=(1, 1), name='%s%s_conv_sep' %(name, suffix))
     conv_dw = Conv(data=conv, num_filter=num_group, num_group=num_group, kernel=kernel, pad=pad, stride=stride, name='%s%s_conv_dw' %(name, suffix))
     proj = Linear(data=conv_dw, num_filter=num_out, kernel=(1, 1), pad=(0, 0), stride=(1, 1), name='%s%s_conv_proj' %(name, suffix))
     return proj
-    
+
 def Residual(data, num_block=1, num_out=1, kernel=(3, 3), stride=(1, 1), pad=(1, 1), num_group=1, name=None, suffix=''):
     identity=data
     for i in range(num_block):
@@ -46,23 +45,23 @@ def Residual(data, num_block=1, num_out=1, kernel=(3, 3), stride=(1, 1), pad=(1,
     	conv=DResidual(data=identity, num_out=num_out, kernel=kernel, stride=stride, pad=pad, num_group=num_group, name='%s%s_block' %(name, suffix), suffix='%d'%i)
     	identity=conv+shortcut
     return identity
-        
+
 def SEModule(data, num_filter, name):
     body = sym.Pooling(data=data, global_pool=True, kernel=(7, 7), pool_type='avg', name=name+'_se_pool1')
-    body = Conv(data=body, num_filter=num_filter//8, kernel=(1,1), stride=(1,1), pad=(0,0),
+    body = sym.Convolution(data=body, num_filter=num_filter//8, kernel=(1,1), stride=(1,1), pad=(0,0),
                               name=name+"_se_conv1")
     body = Act(data=body, act_type="prelu", name=name+'_se_relu1')
-    body = Conv(data=body, num_filter=num_filter, kernel=(1,1), stride=(1,1), pad=(0,0),
+    body = sym.Convolution(data=body, num_filter=num_filter, kernel=(1,1), stride=(1,1), pad=(0,0),
                               name=name+"_se_conv2")
-    body = mx.symbol.Activation(data=body, act_type='sigmoid', name=name+"_se_sigmoid")
-    data = mx.symbol.broadcast_mul(data, body)
+    body = sym.Activation(data=body, act_type='sigmoid', name=name+"_se_sigmoid")
+    data = sym.broadcast_mul(data, body)
     return data
 
 def get_symbol():
     num_classes = config.emb_size
     print('in_network', config)
     fc_type = config.net_output
-    data = mx.symbol.Variable(name="data")
+    data = sym.Variable(name="data")
     data = data-127.5
     data = data*0.0078125
     blocks = config.net_blocks
